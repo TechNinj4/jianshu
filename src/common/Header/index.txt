@@ -1,0 +1,90 @@
+import React from "react";
+import { CSSTransition } from 'react-transition-group';
+import {connect} from "react-redux";
+//import {HeaderWrapper, Logo, Nav, NavItem, NavSearch, Addition, Button, SearchWrapper, SearchInfo, SearchInfoTitle,SearchInfoSwitch,SearchInfoList,SearchInfoItem} from "./style";
+import  * as StyleComponent from "./style";
+/* import * as actionCreators from "./store/actionCreators";
+这种导入语法是正确的,可以正常编译。
+import { * as actionCreators } from './store/actionCreators';
+这种导入语法会报语法错误,不能编译通过。*/
+
+//原因在于 ES Module 的导入语法有一定的规则:
+// 从一个模块中默认导入,使用 import ... from ... 语法
+// 从一个模块中命名导入,使用 import {a, b} from ... 语法
+// 导入所有成员,使用 import * as 语法
+//import * as actionCreators from "./store/actionCreators";
+// self解释:  //import * as actionCreators
+// 把所有成员 导入 actionCreadtors对象。
+// 描述 ：所有成员 给自己 团队、组织和公司起个名字（这个名字是对象），
+// 通过（这个对象）某公司某部门某成员。
+import { actionCreators } from "./store";
+const getListArea = (show)=>{
+	if(show){
+		return(
+			<StyleComponent.SearchInfo>
+				<StyleComponent.SearchInfoTitle>
+					热门搜索
+					<StyleComponent.SearchInfoSwitch>换一批</StyleComponent.SearchInfoSwitch>
+				</StyleComponent.SearchInfoTitle >
+				<StyleComponent.SearchInfoList>
+					<StyleComponent.SearchInfoItem>前端</StyleComponent.SearchInfoItem>
+					<StyleComponent.SearchInfoItem>后端</StyleComponent.SearchInfoItem>
+					<StyleComponent.SearchInfoItem>考研</StyleComponent.SearchInfoItem>
+					<StyleComponent.SearchInfoItem>教育</StyleComponent.SearchInfoItem>
+					<StyleComponent.SearchInfoItem>技术</StyleComponent.SearchInfoItem>
+					<StyleComponent.SearchInfoItem>历史</StyleComponent.SearchInfoItem>
+				</StyleComponent.SearchInfoList>
+			</StyleComponent.SearchInfo>
+		)
+	}
+}
+const Header = ({handleInputFocused,handleInputBlur,focused})=>{
+	return<StyleComponent.HeaderWrapper>
+			<StyleComponent.Logo href='/'/>
+			<StyleComponent.Nav>
+				<StyleComponent.NavItem className='left active'>首页</StyleComponent.NavItem>
+				<StyleComponent.NavItem className='left'>下载APP</StyleComponent.NavItem>
+				<StyleComponent.NavItem className='left'>会员</StyleComponent.NavItem>
+				<StyleComponent.NavItem className='left'>IT技术</StyleComponent.NavItem>
+				<StyleComponent.SearchWrapper>
+					<CSSTransition in={focused} timeout={200} classNames='slide'>
+						<StyleComponent.NavSearch className={focused ? 'focused':''}
+						           onFocus={handleInputFocused}
+						           onBlur={handleInputBlur}
+						></StyleComponent.NavSearch>
+					</CSSTransition>
+					<span className={focused ? 'focused iconfont':'iconfont'}
+
+					>&#xe63a;</span>
+					{getListArea(focused)}
+				</StyleComponent.SearchWrapper>
+				<StyleComponent.NavItem className='right'>登录</StyleComponent.NavItem>
+				<StyleComponent.NavItem className='right'><span className="iconfont">&#xe76a;</span></StyleComponent.NavItem>
+			</StyleComponent.Nav>
+			<StyleComponent.Addition>
+				<StyleComponent.Button className='writing'><span className="iconfont">&#xe600;</span>写文章</StyleComponent.Button>
+				<StyleComponent.Button className='reg'>注册</StyleComponent.Button>
+			</StyleComponent.Addition>
+		</StyleComponent.HeaderWrapper>
+}
+const mapStateToProps = (state)=>{
+	return{
+		//focused:state.get('header').get('focused'),
+		focused: state.getIn(['header','focused']),
+	}
+}
+const mapDispatchToProps= (dispatch)=>{
+	return{
+		handleInputFocused(){
+			// 通过常量调用函数和对象时，常量加圆括号。
+			//const action = actionCreators.searchFOCUSED();
+			dispatch(actionCreators.searchFOCUSED());
+		},
+		handleInputBlur(){
+			//const action = actionCreators.searchBLUR();
+			dispatch(actionCreators.searchBLUR());
+		},
+	}
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(Header);
