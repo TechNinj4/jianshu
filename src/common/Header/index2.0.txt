@@ -1,0 +1,96 @@
+import React,{Component} from "react";
+import { CSSTransition } from 'react-transition-group';
+import {connect} from "react-redux";
+import {HeaderWrapper, Logo, Nav, NavItem, NavSearch, Addition, Button, SearchWrapper, SearchInfo, SearchInfoTitle,SearchInfoSwitch,SearchInfoList,SearchInfoItem} from "./style";
+//import  * as StyleComponent from "./style";
+/* import * as actionCreators from "./store/actionCreators";
+这种导入语法是正确的,可以正常编译。
+import { * as actionCreators } from './store/actionCreators';
+这种导入语法会报语法错误,不能编译通过。*/
+
+//原因在于 ES Module 的导入语法有一定的规则:
+// 从一个模块中默认导入,使用 import ... from ... 语法
+// 从一个模块中命名导入,使用 import {a, b} from ... 语法
+// 导入所有成员,使用 import * as 语法
+//import * as actionCreators from "./store/actionCreators";
+// self解释:  //import * as actionCreators
+// 把所有成员 导入 actionCreadtors对象。
+// 描述 ：所有成员 给自己 团队、组织和公司起个名字（这个名字是对象），
+// 通过（这个对象）某公司某部门某成员。
+import { actionCreators } from "./store";
+
+
+function getListArea(list){
+	// if(show){
+		return(
+			<SearchInfo>
+				<SearchInfoTitle>
+					热门搜索
+					<SearchInfoSwitch>换一批</SearchInfoSwitch>
+				</SearchInfoTitle >
+				<SearchInfoList>
+					{
+						 list.map((item)=>{
+							return <SearchInfoItem key={item}>{item}</SearchInfoItem>
+						})
+					}
+				</SearchInfoList>
+			</SearchInfo>
+		)
+	// }
+	// else{
+	// 	return null;
+	// }
+}
+
+const Header = ({handleInputFocused,handleInputBlur,focused,list})=>{
+	return<HeaderWrapper>
+			<Logo href='/'/>
+			<Nav>
+				<NavItem className='left active'>首页</NavItem>
+				<NavItem className='left'>下载APP</NavItem>
+				<NavItem className='left'>会员</NavItem>
+				<NavItem className='left'>IT技术</NavItem>
+				<SearchWrapper>
+					<CSSTransition in={focused} timeout={200} classNames='slide'>
+						<NavSearch className={focused ? 'focused':''}
+						           onFocus={handleInputFocused}
+						           onBlur={handleInputBlur}
+						></NavSearch>
+					</CSSTransition>
+					<span className={focused ? 'focused iconfont':'iconfont'}>&#xe63a;</span>
+					{getListArea(list)}
+				</SearchWrapper>
+				<NavItem className='right'>登录</NavItem>
+				<NavItem className='right'><span className="iconfont">&#xe76a;</span></NavItem>
+			</Nav>
+			<Addition>
+				<Button className='writing'><span className="iconfont">&#xe600;</span>写文章</Button>
+				<Button className='reg'>注册</Button>
+			</Addition>
+		</HeaderWrapper>
+}
+const mapStateToProps = (state)=>{
+	return{
+		//focused:state.get('header').get('focused'),
+		focused: state.getIn(['header','focused']),
+		list: state.getIn(['header','list'])
+	}
+}
+const mapDispatchToProps= (dispatch)=>{
+	return{
+		handleInputFocused(){
+			// const action = getList();
+			dispatch(actionCreators.getList());
+			// 通过常量调用函数和对象时，常量加圆括号。
+			//const action = actionCreators.searchFOCUSED();
+			dispatch(actionCreators.searchFOCUSED());
+		},
+		handleInputBlur(){
+			//const action = actionCreators.searchBLUR();
+			dispatch(actionCreators.searchBLUR());
+		},
+	}
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(Header);
